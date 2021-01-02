@@ -84,8 +84,7 @@ module cpu_checker(
 	 output [1:0] format_type,
 	 output [3:0] error_code
     );
-	reg [5:0] status;			//ÆäÊµ»¹ÓĞÒ»¸öĞ¡ÎÊÌâ£¬Èç¹û²»ÔÚ¿ªÍ·ÍêÃÀ¸´Î»¸÷ÖÖĞÅºÅµÄ»°£¬¾ÍÒªÔÚÃ¿¸ö·µ»ØS0µÄÅĞ¶ÏÓï¾äÖĞ¼ÓÈë¸´Î»ĞÅºÅ
-									//»¹ÓĞÒ»¼şÊÂ£¬¸÷ÖÖÖÃÎ»ºÍ¸´Î»Ìõ¼şÒ»¶¨ÒªÑĞ¶Á×ĞÏ¸°¡°¡°¡°¡°¡£¡£¡£¡
+	reg [5:0] status;
 	reg [15:0] timereg;
 	reg [31:0] pcreg;
 	reg [31:0] addrreg;
@@ -96,10 +95,10 @@ module cpu_checker(
 	wire [3:0] addrwa;
 	wire [3:0] grfwa;
 
-	reg ishexalphabet; //ÅĞ¶ÏÊÇ·ñÎª16½øÖÆ×ÖÄ¸µÄĞÅºÅ
-	reg isnumber; //ÅĞ¶ÏÊÇ·ñÎªÊı×ÖµÄĞÅºÅ
+	reg ishexalphabet; //åˆ¤æ–­æ˜¯å¦ä¸º16è¿›åˆ¶å­—æ¯çš„ä¿¡å·
+	reg isnumber; //åˆ¤æ–­æ˜¯å¦ä¸ºæ•°å­—çš„ä¿¡å·
 
-	always @(char) begin				//ÅĞ¶ÏÊÇ·ñÎª16½øÖÆ×ÖÄ¸
+	always @(char) begin				//åˆ¤æ–­æ˜¯å¦ä¸º16è¿›åˆ¶å­—æ¯
 		if ((char > 8'h60) && (char < 8'h67)) begin
 			ishexalphabet = 1'b1;
 		end
@@ -108,7 +107,7 @@ module cpu_checker(
 		end
 	end
 
-	always @(char) begin				//ÅĞ¶ÏÊÇ·ñÎªÊı×Ö
+	always @(char) begin				//åˆ¤æ–­æ˜¯å¦ä¸ºæ•°å­—
 		if ((char > 8'h2F) && (char < 8'h3A)) begin
 			isnumber = 1'b1;
 		end
@@ -773,9 +772,9 @@ module cpu_checker(
 								(status == `SS38) ? 2'b10 :
 														  2'b00;
 	
-	assign timewa = (timereg & ((freq >> 1) - 16'b1)) ? 4'b0001 : 4'b0000; //Âú×ãÌõ¼şÖ®ºóÀ¨ºÅÀï·´¶øÊ£ÏÂ0£¬½÷É÷°¡£¡Ö®Ç°Ìõ¼ş»¹±àĞ´´íÁË£¬ÎŞÓï¡­¡­¡­¡­
-	assign pcwa = (((pcreg >= 32'h00003000) && (pcreg <= 32'h00004fff)) && ((pcreg & 3) == 0))? 4'b0000 : 4'b0010;//ÕâÀï£¡£¡£¡
-	assign addrwa = (((addrreg >= 32'h00000000) && (addrreg <= 32'h00002fff)) && (addrreg[1:0] == 2'h0)) ? 4'b0000 : 4'b0100;//ºÍÕâÀï£¡£¡£¡¾¹È»°ÑÅĞ¶ÏÖĞµÄ&&Ğ´³É||£¬·şÁË¡£
+	assign timewa = (timereg & ((freq >> 1) - 16'b1)) ? 4'b0001 : 4'b0000;
+	assign pcwa = (((pcreg >= 32'h00003000) && (pcreg <= 32'h00004fff)) && ((pcreg & 3) == 0))? 4'b0000 : 4'b0010;
+	assign addrwa = (((addrreg >= 32'h00000000) && (addrreg <= 32'h00002fff)) && (addrreg[1:0] == 2'h0)) ? 4'b0000 : 4'b0100;
 	assign grfwa = ((grfreg >= 8'd0) && (grfreg <= 8'd31)) ? 4'b0000 : 4'b1000;
 	
 	assign error_code = ((status == `SR34) || (status == `SS38)) ? (timewa | pcwa | addrwa | grfwa) : 4'b0000;
