@@ -261,6 +261,6 @@ DM：容量为16KB(32bit/word×4096word)。
 
 数据写入 HI 或 LO，均只需 1 个 cycle。
 
+### P7
 
-
-
+添加新部件Bridge、CP0，支持I/O设备、精确中断与精确异常。
