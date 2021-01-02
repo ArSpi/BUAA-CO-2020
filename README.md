@@ -3,7 +3,7 @@
 
 **WARNING：课下代码仅保证能通过2020秋课上强测，不保证完全不存在问题**
 
-**HINT：请务必自行进行测试点构造及课下测试，据小道消息，课下弱测≈编译通过，课下中强测≈弱测**
+**HINT：请务必自行进行测试点构造及课下测试，据不可靠消息，课下弱测≈编译通过，课下中强测≈弱测**
 
 ## 课下测试设计要求
 
@@ -211,9 +211,55 @@ $display("@%h: *%h <= %h", pc, addr, din);
 
 所有指令均以指令集规定的行为为准，可参看MIPS-C指令集（该指令集描述针对单周期，注意单周期和流水线有些许指令行为描述不同，但最终结果是一致的，程序运行的最终结果应与MARS保持一致）。
 
+### P5
 
+处理器应支持MIPS-lite2指令集。
 
+MIPS-lite2={ addu, subu, ori, lw, sw, beq, lui, j, jal, jr, nop }。
 
+处理器为五级流水线设计。
+
+流水线的设计以追求性能为第一目标，因此必须尽最大可能支持转发以解决数据冒险。这一点在本project的最终成绩中所占比重较大，课上测试时会通过测试程序所运行的总周期数进行判定，望大家慎重对待。
+
+对于 b 类和 j 类指令， 流水线设计必须支持延迟槽，因此设计需要注意使用 PC@D+8或PC@I+4。
+
+为了解决数据冒险而设计的转发数据来源必须是某级流水线寄存器，不允许对功能部件的输出直接进行转发。
+
+指令存储器(IM，instruction memory)和数据存储器(DM，data memory)要求如下：
+
+IM：容量为4KB(32bit/word×1024word)。
+
+DM：容量为4KB(32bit/word×1024word)。
+
+PC的初始地址为0x0000_3000，和Mars中我们要求设置的代码初始地址相同。
+
+### P6
+
+处理器应支持MIPS-C3指令集。
+
+MIPS-C3={LB、LBU、LH、LHU、LW、SB、SH、SW、ADD、ADDU、SUB、 SUBU、 MULT、 MULTU、 DIV、 DIVU、 SLL、 SRL、 SRA、 SLLV、SRLV、SRAV、AND、OR、XOR、NOR、ADDI、ADDIU、ANDI、ORI、XORI、LUI、SLT、SLTI、SLTIU、SLTU、BEQ、BNE、BLEZ、BGTZ、BLTZ、BGEZ、J、JAL、JALR、JR、MFHI、MFLO、MTHI、MTLO}
+
+所有运算类指令均暂不考虑因溢出而产生的异常。
+
+处理器为五级流水线设计。
+
+指令存储器(IM，instruction memory)和数据存储器(DM，data memory)要求如下：
+
+IM：容量为16KB(32bit/word×4096word)。
+
+DM：容量为16KB(32bit/word×4096word)。
+
+乘除法运算延迟。我们假定乘/除部件的执行乘法的时间为5个cycle(包含写入内部的HI和LO寄存器)，执行除法的时间为10个cycle。你在乘/除部件内部必须模拟这个延迟，即通过Busy输出标志来反映这个延迟。同时我们通过只能有效1个cycle的Start信号来启动乘除法运算。
+
+乘除模块行为约定如下：
+
+自 Start 信号有效后的第 1 个 clock 上升沿开始，乘除部件开始执行运算，同时 Busy 置位为 1。
+
+在运算结果保存到 HI 和 LO 后，Busy 位清除为 0。
+
+当 Busy 为 1 时，mfhi、mflo、mthi、mtlo、mult、multu、div、divu 均被阻塞，即被阻塞在 IF/ID。
+
+数据写入 HI 或 LO，均只需 1 个 cycle。
 
 
 
